@@ -382,6 +382,44 @@
                     //end of pembatalan qris
                 } else {
                     //#2424
+                    var kodeOrder = document.getElementById('kodeOrder').value;
+                    Swal.fire({
+                        title: "Batalkan Pesanan",
+                        text: "Anda yakin akan membatalkan pesanan ini ?",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Batalkan"
+                        }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.ajax({
+                                url: '<?=base_url('data/batalkanPembayaranCash');?>',
+                                type: 'POST',
+                                dataType: 'json',
+                                data: {
+                                    'kodeOrder': kodeOrder,
+                                    [csrfName]: csrfHash
+                                },
+                                success: function(response) {
+                                    if(response.status == 'success'){
+                                        setTimeout(() => {
+                                            $('#csrf_token_value').val(response.newCsrfHash);
+                                            closeModal('modalLarge');
+                                            loadPesanan('all');
+                                            Swal.fire('Berhasil!', response.message, 'success');
+                                        }, 300);
+                                    } else {
+                                        setTimeout(() => {
+                                            $('#csrf_token_value').val(response.newCsrfHash);
+                                            //closeModal('modalLarge');
+                                            Swal.fire(response.status, response.message, response.status);
+                                        }, 300);
+                                    }
+                                }
+                            }); 
+                        }
+                    });
                 }
             }
         });

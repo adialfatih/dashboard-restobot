@@ -15,6 +15,50 @@ class Data extends CI_Controller
     function index(){ 
         
     } //end
+    function batalkanPembayaranCash(){
+        $tipe2      = "Cash";
+        $kodeOrder  = $this->input->post('kodeOrder', TRUE);
+        $kodeOrder  = strtoupper($kodeOrder);
+        $html       = "";
+        if (is_numeric($kodeOrder)) {
+            $kodeOrder = 'OR' . str_pad($kodeOrder, 3, '0', STR_PAD_LEFT); // 3 digit
+        }
+        $sql        = "SELECT kode_pesanan,nomor_wa,metode_pembayaran,total_harga,status FROM pesanan WHERE kode_pesanan = ? AND metode_pembayaran = ?";
+        $data       = $this->db->query($sql, [$kodeOrder, $tipe2]);
+        if($data->num_rows() == 1){
+            $id       = $data->row("kode_pesanan");
+            $total    = $data->row("total_harga");
+            $nomor_wa = $data->row("nomor_wa");
+            $status   = $data->row("status");
+            //if($status=="Menunggu Pembayaran"){
+                $this->data_model->updatedata('kode_pesanan',$id,'pesanan', ['status' => 'Dibatalkan']);
+                $this->db->query("DELETE FROM pembayaran_masuk WHERE kode_pesanan='$id'");
+                $response = [
+                    'status' => 'success',
+                    'message' => 'Pesanan Telah Dibatalkan',
+                    'kode_pesanan' => $kode_pesanan,
+                    'newCsrfHash' => $this->security->get_csrf_hash()
+                ];
+            $isi_pesan = "❌ Pesanan dibatalkan\n\nID Pesanan *#".$id."* \n\nKetik *Pesan* untuk kembali memesan makanan.";
+            $this->data_model->kirim_notif_ke_wa($nomor_wa,$isi_pesan,'');
+            // } else {
+            //     $response = [
+            //         'status' => 'error',
+            //         'message' => 'Status Pesanan Adalah '.$status.'',
+            //         'kode_pesanan' => 'null',
+            //         'newCsrfHash' => $this->security->get_csrf_hash()
+            //     ];
+            // }
+        } else {
+            $response = [
+                'status' => 'error',
+                'message' => 'Kode Pesanan Tidak Ditemukan',
+                'kode_pesanan' => 'null',
+                'newCsrfHash' => $this->security->get_csrf_hash()
+            ];
+        }
+        echo json_encode($response);
+    }
     function batalkanPembayaranQris(){
         $kodeUnik = $this->input->post('kodeUnik', TRUE);
         $cek = $this->db->query("SELECT * FROM pembayaran_kodeunik WHERE kode_unik='$kodeUnik' AND DATE(tanggal_code) = CURDATE()");

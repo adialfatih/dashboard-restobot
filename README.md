@@ -1,6 +1,6 @@
-# 🚀 CodeIgniter 3 - Starter Kit untuk REST API & PDF/Spreadsheet 📦
+# 🚀 Dashboard - Resto Bot Management  📦
 
-Sebuah **starter project CodeIgniter 3** yang telah dimodifikasi secara lengkap dan profesional — siap digunakan sebagai fondasi dalam membangun aplikasi PHP berbasis REST API dengan dukungan **Spreadsheet Export/Import** dan **FPDF Report Generator**.
+Sebuah **Dashboard** yang telah dimodifikasi secara lengkap dan profesional — siap digunakan untuk memangement pemesanan oleh kasir **Spreadsheet Export/Import** dan **FPDF Report Generator**.
 
 ---
 
