@@ -1,0 +1,349 @@
+<?php
+defined('BASEPATH') OR exit('No direct script access allowed');
+
+class Data extends CI_Controller
+{
+    function __construct()
+    {
+        parent::__construct();
+        $this->load->model('data_model');
+        if($this->session->userdata('login_form') != "bot-as1563sd1123sfasda2389asff53afhafaf670fa"){
+            redirect(base_url('login'));
+        }
+    }
+    
+    function index(){ 
+        
+    } //end
+    function batalkanPembayaranQris(){
+        $kodeUnik = $this->input->post('kodeUnik', TRUE);
+        $cek = $this->db->query("SELECT * FROM pembayaran_kodeunik WHERE kode_unik='$kodeUnik' AND DATE(tanggal_code) = CURDATE()");
+        if($cek->num_rows() == 1){
+            $id = $cek->row("kode_pesanan");
+            $nomor_wa = $this->db->query("SELECT nomor_wa FROM pesanan WHERE kode_pesanan='$id'")->row("nomor_wa");
+            $this->data_model->updatedata('kode_pesanan',$id,'pembayaran_kodeunik', ['status' => 'Dibatalkan']);
+            $this->data_model->updatedata('kode_pesanan',$id,'pesanan', ['status' => 'Dibatalkan']);
+            $this->db->query("DELETE FROM pembayaran_masuk WHERE kode_pesanan='$id'");
+            $response = [
+                    'status' => 'success',
+                    'message' => 'Pesanan Telah Dibatalkan',
+                    'kode_pesanan' => $kode_pesanan,
+                    'newCsrfHash' => $this->security->get_csrf_hash()
+                ];
+            $isi_pesan = "❌ Pesanan dibatalkan\n\nID Pesanan *#".$id."* \n\nKetik *Pesan* untuk kembali memesan makan.";
+            $this->data_model->kirim_notif_ke_wa($nomor_wa,$isi_pesan,'');
+        } else {
+            $response = [
+                'status' => 'error',
+                'message' => 'Kode unik tidak ditemukan',
+                'kode_pesanan' => 'null',
+                'newCsrfHash' => $this->security->get_csrf_hash()
+            ];
+        }
+        echo json_encode($response);
+    }
+
+    function updatePembayaranQris(){
+        $kodeUnik = $this->input->post('kodeUnik', TRUE);
+        $cek = $this->db->query("SELECT * FROM pembayaran_kodeunik WHERE kode_unik='$kodeUnik' AND DATE(tanggal_code) = CURDATE()");
+        if($cek->num_rows() == 1){
+            $id       = $cek->row("kode_pesanan");
+            $tt       = $cek->row("total_asli");
+            $th       = $cek->row("kode_unik");
+            $td       = $cek->row("total_tagihan");
+            $status2  = $cek->row("status");
+            $nomor_wa = $this->db->query("SELECT nomor_wa FROM pesanan WHERE kode_pesanan='$id'")->row("nomor_wa");
+            if($status2=="Menunggu Pembayaran"){
+                $this->data_model->updatedata('kode_pesanan',$id,'pembayaran_kodeunik', ['status' => 'Dibayar']);
+                $this->data_model->updatedata('kode_pesanan',$id,'pesanan', ['status' => 'Dibayar']);
+                $this->data_model->saved('pembayaran_masuk',[
+                    'kode_pesanan' => $id,
+                    'nominal_tagihan' => $tt,
+                    'kode_unik' => $th,
+                    'total_pembayaran' => $td,
+                    'tgl_terima' => date('Y-m-d H:i:s'),
+                    'penerima' => $this->session->userdata('nama'),
+                    'jenis_pemb' => 'QRIS'
+                ]);
+                $isi_pesan = "✅ Terimakasih, pembayaran telah diterima\n\nID Pesanan *#".$id."* \n\nKetik *Status* untuk melihat status pesanan anda.";
+                $this->data_model->kirim_notif_ke_wa($nomor_wa,$isi_pesan,'');
+                $response = [
+                    'status' => 'success',
+                    'message' => 'Pembayaran berhasil. Pesanan akan segera diproses.',
+                    'kode_pesanan' => $id,
+                    'nomorwa' => $nomor_wa,
+                    'isipesan'=> $isi_pesan,
+                    'mediapesan' => '',
+                    'newCsrfHash' => $this->security->get_csrf_hash()
+                ];
+            } else {
+                $response = [
+                    'status' => 'info',
+                    'message' => 'Pesanan ini telah di bayar.!',
+                    'kode_pesanan' => $id,
+                    'newCsrfHash' => $this->security->get_csrf_hash()
+                ];
+            }
+        } else {
+            if($cek->num_rows() == 0){
+                $response = [
+                    'status' => 'error',
+                    'message' => 'Kode unik tidak ditemukan',
+                    'kode_pesanan' => 'null',
+                    'newCsrfHash' => $this->security->get_csrf_hash()
+                ];
+            } else {
+                $response = [
+                    'status' => 'error',
+                    'message' => 'Kode Error (221) Hubungi Developer.',
+                    'kode_pesanan' => 'null',
+                    'newCsrfHash' => $this->security->get_csrf_hash()
+                ];
+            }
+        }
+        echo json_encode($response);
+    }
+    function simpanPembayaranCash(){
+        $tipe2      = "Cash";
+        $kodeOrder  = $this->input->post('kodeOrder', TRUE);
+        $kodeOrder  = strtoupper($kodeOrder);
+        $html       = "";
+        if (is_numeric($kodeOrder)) {
+            $kodeOrder = 'OR' . str_pad($kodeOrder, 3, '0', STR_PAD_LEFT); // 3 digit
+        }
+        $sql        = "SELECT kode_pesanan,nomor_wa,metode_pembayaran,total_harga,status FROM pesanan WHERE kode_pesanan = ? AND metode_pembayaran = ?";
+        $data       = $this->db->query($sql, [$kodeOrder, $tipe2]);
+        if($data->num_rows() == 1){
+            $id       = $data->row("kode_pesanan");
+            $total    = $data->row("total_harga");
+            $nomor_wa = $data->row("nomor_wa");
+            $status   = $data->row("status");
+            if($status=="Menunggu Pembayaran"){
+                $this->data_model->updatedata('kode_pesanan',$id,'pesanan', ['status' => 'Dibayar']);
+                $this->data_model->saved('pembayaran_masuk',[
+                    'kode_pesanan' => $id,
+                    'nominal_tagihan' => $total,
+                    'kode_unik' => 0,
+                    'total_pembayaran' => $total,
+                    'tgl_terima' => date('Y-m-d H:i:s'),
+                    'penerima' => $this->session->userdata('nama'),
+                    'jenis_pemb' => 'Cash'
+                ]);
+                $isi_pesan = "✅ Terimakasih, pembayaran telah diterima\n\nID Pesanan *#".$id."* \n\nKetik *Status* untuk melihat status pesanan anda.";
+                $this->data_model->kirim_notif_ke_wa($nomor_wa,$isi_pesan,'');
+                $response = [
+                    'status' => 'success',
+                    'message' => 'Pembayaran berhasil. Pesanan akan segera diproses.',
+                    'kode_pesanan' => $id,
+                    'nomorwa' => $nomor_wa,
+                    'isipesan'=> $isi_pesan,
+                    'mediapesan' => '',
+                    'newCsrfHash' => $this->security->get_csrf_hash()
+                ];
+            } else {
+                $response = [
+                    'status' => 'error',
+                    'message' => 'Status Pesanan Adalah '.$status.'',
+                    'kode_pesanan' => 'null',
+                    'newCsrfHash' => $this->security->get_csrf_hash()
+                ];
+            }
+        } else {
+            $response = [
+                'status' => 'error',
+                'message' => 'Kode Pesanan Tidak Ditemukan',
+                'kode_pesanan' => 'null',
+                'newCsrfHash' => $this->security->get_csrf_hash()
+            ];
+        }
+        echo json_encode($response);
+    }
+
+    function show_pesanan(){
+        $tipe = $this->input->post('tipe', TRUE);
+        if($tipe=="all"){
+            $qry = $this->db->query("SELECT pesanan.id, pesanan.kode_pesanan, pesanan.nomor_wa, pesanan.daftar_kode_menu, pesanan.total_harga, pesanan.metode_pengambilan, pesanan.alamat, pesanan.no_meja, pesanan.metode_pembayaran, pesanan.status, pesanan.tanggal, pesanan.created_at, user.nama FROM pesanan,user WHERE pesanan.nomor_wa=user.nomor_wa ORDER BY id");
+            $html = "";
+            if($qry->num_rows() > 0){
+                foreach($qry->result() as $row){
+                    $nama_pemesan = strtolower($row->nama);
+                    if($row->status == "Dibatalkan"){
+                        $efek = "style='color:red;'";
+                        $icon = "fa-xmark";
+                        $icon2 = '<div class="card-icon pink"><i class="fas fa-xmark"></i></div>';
+                    } elseif($row->status == "Selesai"){ 
+                        $efek = "style='color:green;'";
+                        $icon = "fa-circle-check";
+                        $icon2 = '<div class="card-icon green"><i class="fas fa-circle-check"></i></div>';
+                    } elseif($row->status=="Menunggu Pembayaran"){
+                        $efek = "style='color:orange;'";
+                        $icon = "fa-stopwatch";
+                        $icon2 = '<div class="card-icon orange"><i class="fas fa-stopwatch"></i></div>';
+                    } elseif($row->status=="Dibayar"){
+                        $efek = "style='color:blue;'";
+                        $icon = "fa-credit-card";
+                        $icon2 = '<div class="card-icon blue"><i class="fas fa-credit-card"></i></div>';
+                    } elseif($row->status=="Sedang dibuat"){
+                        $efek = "style='color:#fc03be;'";
+                        $icon = "fa-utensils";
+                        $icon2 = '<div class="card-icon pink"><i class="fas fa-utensils"></i></div>';
+                    }
+                    $hasil = "";
+                    $x = explode(",", $row->daftar_kode_menu);
+                    $html .= '
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">'.ucwords($nama_pemesan).'</div>
+                                <div class="card-value">'.$row->kode_pesanan.'</div>
+                                <div class="card-change" '.$efek.'>
+                                    '.$row->status.'
+                                </div>
+                            </div>
+                            '.$icon2.'
+                        </div>
+                        <div class="card-body" style="font-size:12px;">
+                            ';
+                    for ($i=0; $i <count($x) ; $i++) { 
+                        $xx = explode('x', $x[$i]);
+                        $nama_menu = $this->db->query("SELECT kode_menu,nama_menu FROM table_menu WHERE kode_menu='$xx[0]'")->row('nama_menu');
+                        $html .= '<div style="width:100%;display:flex;justify-content:space-between;align-items:center;">
+                            <span>#<strong>'.$xx[0].'</strong> '.$nama_menu.'</span>
+                            <span style="width:20px;">x '.$xx[1].'</span>
+                            </div>
+                        ';
+                    }
+                    if($row->status == "Dibayar"){
+                        $html .= '<div style="font-size:12px;border-top:1px solid #ccc;margin-top:10px;padding-top:5px;">
+                            <a href="javascript:void(0);" onclick="tandaiSedangDibuat(\'' . $row->kode_pesanan . '\');" style="color:red;text-decoration:none;">Tandai sedang dibuat.</a>
+                        </div>';
+                    }
+                    if($row->status == "Sedang dibuat"){
+                        $html .= '<div style="font-size:12px;border-top:1px solid #ccc;margin-top:10px;padding-top:5px;">
+                            <a href="javascript:void(0);" onclick="tandaiSelesaiDibuat(\'' . $row->kode_pesanan . '\');" style="color:green;text-decoration:none;">Pesanan Selesai.</a>
+                        </div>';
+                    }
+                    $html .= '<button style="outline:none;border:none;cursor:pointer;background:#4287f5;color:#fff;padding:5px 10px;border-radius:5px;margin-top:10px;font-size:11px;" id="btnPrint" onclick="printStruk()"><i class="fas fa-print"></i>&nbsp; Cetak</button>
+                        </div>
+                    </div>
+                    ';
+                }
+            } else {
+                $html = "Belum ada pesanan masuk.";
+            }
+        } else {
+            //disini tampilkan bukan semua pesanan
+        }
+        $response = [
+            'status' => $status,
+            'message' => $msg,
+            'html' => $html,
+            'newCsrfHash' => $this->security->get_csrf_hash()
+        ];
+        echo json_encode($response);
+    }
+    function lihatOrderByKode(){
+        $tipe       = $this->input->post('ktipeode', TRUE);
+        $tipe2      = "Cash";
+        $kodeOrder  = $this->input->post('kodeOrder', TRUE);
+        $kodeOrder  = strtoupper($kodeOrder);
+        $html       = "";
+        if (is_numeric($kodeOrder)) {
+            $kodeOrder = 'OR' . str_pad($kodeOrder, 3, '0', STR_PAD_LEFT); // 3 digit
+        }
+        $sql        = "SELECT * FROM pesanan WHERE kode_pesanan = ? AND metode_pembayaran = ?";
+        $data       = $this->db->query($sql, [$kodeOrder, $tipe2]);
+        if($data->num_rows() == 1){
+            $row = $data->row_array();
+            $nomorwa = $row['nomor_wa'];
+            $allmenu = $row['daftar_kode_menu'];
+            $x = explode(",", $allmenu);
+            $nama_cus = $this->db->query("SELECT nomor_wa,nama FROM user WHERE nomor_wa = '$nomorwa'")->row('nama');
+            $html .= '
+                <div style="margin-top:15px;width:100%;display:flex;align-items:center;gap:10px;">
+                    <span style="width:150px;">Kode Pesanan</span>
+                    <div>: <span style="color:green;font-weight:bold;">'.$kodeOrder.'</span></div>
+                </div>
+                <div style="width:100%;display:flex;align-items:center;gap:10px;">
+                    <span style="width:150px;">Nama Customer</span>
+                    <span>: '.$nama_cus.'</span>
+                </div>
+                <div style="width:100%;display:flex;align-items:center;gap:10px;">
+                    <span style="width:150px;">Total Tagihan</span>
+                    <div>: Rp. <span style="color:red;font-weight:bold;">'.number_format($row['total_harga']).'</span></div>
+                </div>
+                <table border="1" style="margin-bottom:20px;">
+                    <tr>
+                        <td>No</td>
+                        <td>Menu</td>
+                        <td>Harga</td>
+                        <td>Qty</td>
+                        <td>Total</td>
+                    </tr>
+            ';
+            for ($i=0; $i <count($x) ; $i++) { 
+                $_no = $i + 1;
+                $xx = explode('x', $x[$i]);
+                $kode_menu = $xx[0];
+                $qty = $xx[1];
+                $mn = $this->db->query("SELECT kode_menu,nama_menu,harga FROM table_menu WHERE kode_menu = '$kode_menu'")->row_array();
+                $nama_menu = strtolower($mn['nama_menu']);
+                $harga_menu = $mn['harga'];
+                $total_this = $qty * $harga_menu;
+                $html .= '
+                    <tr>
+                        <td>'.$_no.'</td>
+                        <td>#'.$kode_menu.' - '.ucwords($nama_menu).'</td>
+                        <td>Rp. '.number_format($harga_menu).'</td>
+                        <td>'.$qty.'</td>
+                        <td>Rp. '.number_format($total_this).'</td>
+                    </tr>
+                ';
+            }
+            $html .= '</table>';
+            $response = [
+                'status' => 'success',
+                'message' => 'Pesanan ditemukan.',
+                'html' => $html,
+                'kode_pesanan' => $kodeOrder,
+                'newCsrfHash' => $this->security->get_csrf_hash()
+            ];
+        } else {
+            $html = '<span style="color:red;margin-top:15px;"><strong>'.$kodeOrder.'</strong> : Pesanan tidak ditemukan</span>';
+            $response = [
+                'status' => 'error',
+                'message' => 'Pesanan tidak ditemukan.',
+                'html' => $html,
+                'newCsrfHash' => $this->security->get_csrf_hash()
+            ];
+        }
+        echo json_encode($response);
+    }
+    function updateSedangDibuat(){
+        $kode = $this->input->post('kode', TRUE);
+        $nomor_wa  = $this->db->query("SELECT kode_pesanan,nomor_wa FROM pesanan WHERE kode_pesanan = '$kode'")->row("nomor_wa");
+        $this->data_model->updatedata('kode_pesanan', $kode, 'pesanan', ['status' => 'Sedang dibuat']);
+        $response = [
+            'status' => 'success',
+            'message' => 'Pesanan sedang dibuat.',
+            'newCsrfHash' => $this->security->get_csrf_hash()
+        ];
+        $isi_pesan = "🍽 Pesanan sedang dibuat.";
+        $this->data_model->kirim_notif_ke_wa($nomor_wa,$isi_pesan,'');
+        echo json_encode($response);
+    }
+    function updateSelesaiDibuat(){
+        $kode = $this->input->post('kode', TRUE);
+        $nomor_wa  = $this->db->query("SELECT kode_pesanan,nomor_wa FROM pesanan WHERE kode_pesanan = '$kode'")->row("nomor_wa");
+        $this->data_model->updatedata('kode_pesanan', $kode, 'pesanan', ['status' => 'Selesai']);
+        $response = [
+            'status' => 'success',
+            'message' => 'Pesanan sedang dibuat.',
+            'newCsrfHash' => $this->security->get_csrf_hash()
+        ];
+        $isi_pesan = "🍻 Pesanan anda selesai dibuat.";
+        $this->data_model->kirim_notif_ke_wa($nomor_wa,$isi_pesan,'');
+        echo json_encode($response);
+    }
+}
+?>
