@@ -41,14 +41,7 @@ class Data extends CI_Controller
                 ];
             $isi_pesan = "❌ Pesanan dibatalkan\n\nID Pesanan *#".$id."* \n\nKetik *Pesan* untuk kembali memesan makanan.";
             $this->data_model->kirim_notif_ke_wa($nomor_wa,$isi_pesan,'');
-            // } else {
-            //     $response = [
-            //         'status' => 'error',
-            //         'message' => 'Status Pesanan Adalah '.$status.'',
-            //         'kode_pesanan' => 'null',
-            //         'newCsrfHash' => $this->security->get_csrf_hash()
-            //     ];
-            // }
+            
         } else {
             $response = [
                 'status' => 'error',

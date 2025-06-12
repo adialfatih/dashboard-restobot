@@ -351,3 +351,54 @@ INFO - 2025-06-10 06:27:31 --> Controller Class Initialized
 INFO - 2025-06-10 06:27:31 --> Model Class Initialized
 INFO - 2025-06-10 06:27:31 --> Final output sent to browser
 DEBUG - 2025-06-10 06:27:31 --> Total execution time: 0.0820
+INFO - 2025-06-10 06:30:27 --> Config Class Initialized
+INFO - 2025-06-10 06:30:27 --> Hooks Class Initialized
+DEBUG - 2025-06-10 06:30:27 --> UTF-8 Support Enabled
+INFO - 2025-06-10 06:30:27 --> Utf8 Class Initialized
+INFO - 2025-06-10 06:30:27 --> URI Class Initialized
+INFO - 2025-06-10 06:30:27 --> Router Class Initialized
+INFO - 2025-06-10 06:30:27 --> Output Class Initialized
+INFO - 2025-06-10 06:30:27 --> Security Class Initialized
+DEBUG - 2025-06-10 06:30:27 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-06-10 06:30:27 --> CSRF cookie sent
+INFO - 2025-06-10 06:30:27 --> Input Class Initialized
+INFO - 2025-06-10 06:30:27 --> Language Class Initialized
+INFO - 2025-06-10 06:30:27 --> Loader Class Initialized
+INFO - 2025-06-10 06:30:27 --> Helper loaded: security_helper
+INFO - 2025-06-10 06:30:27 --> Helper loaded: url_helper
+INFO - 2025-06-10 06:30:27 --> Helper loaded: form_helper
+INFO - 2025-06-10 06:30:27 --> Database Driver Class Initialized
+DEBUG - 2025-06-10 06:30:27 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-06-10 06:30:27 --> Session: Class initialized using 'files' driver.
+INFO - 2025-06-10 06:30:27 --> Controller Class Initialized
+INFO - 2025-06-10 06:30:27 --> Model Class Initialized
+INFO - 2025-06-10 06:30:27 --> File loaded: C:\xampp\htdocs\botresto\application\views\part/header.php
+INFO - 2025-06-10 06:30:27 --> File loaded: C:\xampp\htdocs\botresto\application\views\part/left_nav.php
+INFO - 2025-06-10 06:30:27 --> File loaded: C:\xampp\htdocs\botresto\application\views\pages/dash_kasir.php
+INFO - 2025-06-10 06:30:27 --> File loaded: C:\xampp\htdocs\botresto\application\views\part/main_js.php
+INFO - 2025-06-10 06:30:27 --> Final output sent to browser
+DEBUG - 2025-06-10 06:30:27 --> Total execution time: 0.0522
+INFO - 2025-06-10 06:30:27 --> Config Class Initialized
+INFO - 2025-06-10 06:30:27 --> Hooks Class Initialized
+DEBUG - 2025-06-10 06:30:27 --> UTF-8 Support Enabled
+INFO - 2025-06-10 06:30:27 --> Utf8 Class Initialized
+INFO - 2025-06-10 06:30:27 --> URI Class Initialized
+INFO - 2025-06-10 06:30:27 --> Router Class Initialized
+INFO - 2025-06-10 06:30:27 --> Output Class Initialized
+INFO - 2025-06-10 06:30:27 --> Security Class Initialized
+DEBUG - 2025-06-10 06:30:27 --> Global POST, GET and COOKIE data sanitized
+INFO - 2025-06-10 06:30:27 --> CSRF cookie sent
+INFO - 2025-06-10 06:30:27 --> CSRF token verified
+INFO - 2025-06-10 06:30:27 --> Input Class Initialized
+INFO - 2025-06-10 06:30:27 --> Language Class Initialized
+INFO - 2025-06-10 06:30:27 --> Loader Class Initialized
+INFO - 2025-06-10 06:30:27 --> Helper loaded: security_helper
+INFO - 2025-06-10 06:30:27 --> Helper loaded: url_helper
+INFO - 2025-06-10 06:30:27 --> Helper loaded: form_helper
+INFO - 2025-06-10 06:30:27 --> Database Driver Class Initialized
+DEBUG - 2025-06-10 06:30:27 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2025-06-10 06:30:27 --> Session: Class initialized using 'files' driver.
+INFO - 2025-06-10 06:30:27 --> Controller Class Initialized
+INFO - 2025-06-10 06:30:27 --> Model Class Initialized
+INFO - 2025-06-10 06:30:27 --> Final output sent to browser
+DEBUG - 2025-06-10 06:30:27 --> Total execution time: 0.0580
