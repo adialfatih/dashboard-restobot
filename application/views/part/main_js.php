@@ -24,6 +24,24 @@
             </li>
             <li>
                 <a href="javascript:void(0);" onclick="logout()" class="menu-item">
+                    <i class="fas fa-truck"></i>
+                    <span class="menu-text2">Pesan Antar</span>
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0);" onclick="logout()" class="menu-item">
+                    <i class="fas fa-list"></i>
+                    <span class="menu-text2">Daftar Menu</span>
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0);" onclick="logout()" class="menu-item">
+                    <i class="fas fa-clock"></i>
+                    <span class="menu-text2">Jam Buka</span>
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0);" onclick="logout()" class="menu-item">
                     <i class="fas fa-arrow-right-from-bracket"></i>
                     <span class="menu-text2">Logout</span>
                 </a>
@@ -211,7 +229,7 @@
                         $('#cardGridView').html(response.html);
                         $('#csrf_token_value').val(response.newCsrfHash);
                         $('#loader').hide();
-                    }, 800);
+                    }, 100);
                     
 				}
             });

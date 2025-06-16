@@ -198,11 +198,14 @@ class Data extends CI_Controller
 
     function show_pesanan(){
         $tipe = $this->input->post('tipe', TRUE);
+        $html = "";
         if($tipe=="all"){
-            $qry = $this->db->query("SELECT pesanan.id, pesanan.kode_pesanan, pesanan.nomor_wa, pesanan.daftar_kode_menu, pesanan.total_harga, pesanan.metode_pengambilan, pesanan.alamat, pesanan.no_meja, pesanan.metode_pembayaran, pesanan.status, pesanan.tanggal, pesanan.created_at, user.nama FROM pesanan,user WHERE pesanan.nomor_wa=user.nomor_wa ORDER BY id");
-            $html = "";
-            if($qry->num_rows() > 0){
-                foreach($qry->result() as $row){
+            $tgl_now = date('Y-m-d');
+            //$html .= ''.$tgl_now.'<br>';
+            //tampilkan yang statusnya adalah sedang dibuat
+            $qry1 = $this->db->query("SELECT pesanan.id, pesanan.kode_pesanan, pesanan.nomor_wa, pesanan.daftar_kode_menu, pesanan.total_harga, pesanan.metode_pengambilan, pesanan.alamat, pesanan.no_meja, pesanan.metode_pembayaran, pesanan.status, pesanan.tanggal, pesanan.created_at, user.nama FROM pesanan,user WHERE pesanan.nomor_wa=user.nomor_wa AND pesanan.status='Sedang dibuat' ORDER BY id");
+            if($qry1->num_rows() > 0){
+                foreach($qry1->result() as $row){
                     $nama_pemesan = strtolower($row->nama);
                     if($row->status == "Dibatalkan"){
                         $efek = "style='color:red;'";
@@ -265,9 +268,141 @@ class Data extends CI_Controller
                     </div>
                     ';
                 }
-            } else {
-                $html = "Belum ada pesanan masuk.";
             }
+            //tampilkan yang statusnya adalah dibayar
+            $qry2 = $this->db->query("SELECT pesanan.id, pesanan.kode_pesanan, pesanan.nomor_wa, pesanan.daftar_kode_menu, pesanan.total_harga, pesanan.metode_pengambilan, pesanan.alamat, pesanan.no_meja, pesanan.metode_pembayaran, pesanan.status, pesanan.tanggal, pesanan.created_at, user.nama FROM pesanan,user WHERE pesanan.nomor_wa=user.nomor_wa AND pesanan.status='Dibayar' ORDER BY id");
+            if($qry2->num_rows() > 0){
+                foreach($qry2->result() as $row){
+                    $nama_pemesan = strtolower($row->nama);
+                    if($row->status == "Dibatalkan"){
+                        $efek = "style='color:red;'";
+                        $icon = "fa-xmark";
+                        $icon2 = '<div class="card-icon pink"><i class="fas fa-xmark"></i></div>';
+                    } elseif($row->status == "Selesai"){ 
+                        $efek = "style='color:green;'";
+                        $icon = "fa-circle-check";
+                        $icon2 = '<div class="card-icon green"><i class="fas fa-circle-check"></i></div>';
+                    } elseif($row->status=="Menunggu Pembayaran"){
+                        $efek = "style='color:orange;'";
+                        $icon = "fa-stopwatch";
+                        $icon2 = '<div class="card-icon orange"><i class="fas fa-stopwatch"></i></div>';
+                    } elseif($row->status=="Dibayar"){
+                        $efek = "style='color:blue;'";
+                        $icon = "fa-credit-card";
+                        $icon2 = '<div class="card-icon blue"><i class="fas fa-credit-card"></i></div>';
+                    } elseif($row->status=="Sedang dibuat"){
+                        $efek = "style='color:#fc03be;'";
+                        $icon = "fa-utensils";
+                        $icon2 = '<div class="card-icon pink"><i class="fas fa-utensils"></i></div>';
+                    }
+                    $hasil = "";
+                    $x = explode(",", $row->daftar_kode_menu);
+                    $html .= '
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">'.ucwords($nama_pemesan).'</div>
+                                <div class="card-value">'.$row->kode_pesanan.'</div>
+                                <div class="card-change" '.$efek.'>
+                                    '.$row->status.'
+                                </div>
+                            </div>
+                            '.$icon2.'
+                        </div>
+                        <div class="card-body" style="font-size:12px;">
+                            ';
+                    for ($i=0; $i <count($x) ; $i++) { 
+                        $xx = explode('x', $x[$i]);
+                        $nama_menu = $this->db->query("SELECT kode_menu,nama_menu FROM table_menu WHERE kode_menu='$xx[0]'")->row('nama_menu');
+                        $html .= '<div style="width:100%;display:flex;justify-content:space-between;align-items:center;">
+                            <span>#<strong>'.$xx[0].'</strong> '.$nama_menu.'</span>
+                            <span style="width:20px;">x '.$xx[1].'</span>
+                            </div>
+                        ';
+                    }
+                    if($row->status == "Dibayar"){
+                        $html .= '<div style="font-size:12px;border-top:1px solid #ccc;margin-top:10px;padding-top:5px;">
+                            <a href="javascript:void(0);" onclick="tandaiSedangDibuat(\'' . $row->kode_pesanan . '\');" style="color:red;text-decoration:none;">Tandai sedang dibuat.</a>
+                        </div>';
+                    }
+                    if($row->status == "Sedang dibuat"){
+                        $html .= '<div style="font-size:12px;border-top:1px solid #ccc;margin-top:10px;padding-top:5px;">
+                            <a href="javascript:void(0);" onclick="tandaiSelesaiDibuat(\'' . $row->kode_pesanan . '\');" style="color:green;text-decoration:none;">Pesanan Selesai.</a>
+                        </div>';
+                    }
+                    $html .= '<button style="outline:none;border:none;cursor:pointer;background:#4287f5;color:#fff;padding:5px 10px;border-radius:5px;margin-top:10px;font-size:11px;" id="btnPrint" onclick="printStruk()"><i class="fas fa-print"></i>&nbsp; Cetak</button>
+                        </div>
+                    </div>
+                    ';
+                }
+            }
+            //tampilkan yang statusnya adalah Menunggu Pembayaran
+            $qry3 = $this->db->query("SELECT pesanan.id, pesanan.kode_pesanan, pesanan.nomor_wa, pesanan.daftar_kode_menu, pesanan.total_harga, pesanan.metode_pengambilan, pesanan.alamat, pesanan.no_meja, pesanan.metode_pembayaran, pesanan.status, pesanan.tanggal, pesanan.created_at, user.nama FROM pesanan,user WHERE pesanan.nomor_wa=user.nomor_wa AND pesanan.status='Menunggu Pembayaran' ORDER BY id");
+            if($qry3->num_rows() > 0){
+                foreach($qry3->result() as $row){
+                    $nama_pemesan = strtolower($row->nama);
+                    if($row->status == "Dibatalkan"){
+                        $efek = "style='color:red;'";
+                        $icon = "fa-xmark";
+                        $icon2 = '<div class="card-icon pink"><i class="fas fa-xmark"></i></div>';
+                    } elseif($row->status == "Selesai"){ 
+                        $efek = "style='color:green;'";
+                        $icon = "fa-circle-check";
+                        $icon2 = '<div class="card-icon green"><i class="fas fa-circle-check"></i></div>';
+                    } elseif($row->status=="Menunggu Pembayaran"){
+                        $efek = "style='color:orange;'";
+                        $icon = "fa-stopwatch";
+                        $icon2 = '<div class="card-icon orange"><i class="fas fa-stopwatch"></i></div>';
+                    } elseif($row->status=="Dibayar"){
+                        $efek = "style='color:blue;'";
+                        $icon = "fa-credit-card";
+                        $icon2 = '<div class="card-icon blue"><i class="fas fa-credit-card"></i></div>';
+                    } elseif($row->status=="Sedang dibuat"){
+                        $efek = "style='color:#fc03be;'";
+                        $icon = "fa-utensils";
+                        $icon2 = '<div class="card-icon pink"><i class="fas fa-utensils"></i></div>';
+                    }
+                    $hasil = "";
+                    $x = explode(",", $row->daftar_kode_menu);
+                    $html .= '
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">'.ucwords($nama_pemesan).'</div>
+                                <div class="card-value">'.$row->kode_pesanan.'</div>
+                                <div class="card-change" '.$efek.'>
+                                    '.$row->status.'
+                                </div>
+                            </div>
+                            '.$icon2.'
+                        </div>
+                        <div class="card-body" style="font-size:12px;">
+                            ';
+                    for ($i=0; $i <count($x) ; $i++) { 
+                        $xx = explode('x', $x[$i]);
+                        $nama_menu = $this->db->query("SELECT kode_menu,nama_menu FROM table_menu WHERE kode_menu='$xx[0]'")->row('nama_menu');
+                        $html .= '<div style="width:100%;display:flex;justify-content:space-between;align-items:center;">
+                            <span>#<strong>'.$xx[0].'</strong> '.$nama_menu.'</span>
+                            <span style="width:20px;">x '.$xx[1].'</span>
+                            </div>
+                        ';
+                    }
+                    if($row->status == "Dibayar"){
+                        $html .= '<div style="font-size:12px;border-top:1px solid #ccc;margin-top:10px;padding-top:5px;">
+                            <a href="javascript:void(0);" onclick="tandaiSedangDibuat(\'' . $row->kode_pesanan . '\');" style="color:red;text-decoration:none;">Tandai sedang dibuat.</a>
+                        </div>';
+                    }
+                    if($row->status == "Sedang dibuat"){
+                        $html .= '<div style="font-size:12px;border-top:1px solid #ccc;margin-top:10px;padding-top:5px;">
+                            <a href="javascript:void(0);" onclick="tandaiSelesaiDibuat(\'' . $row->kode_pesanan . '\');" style="color:green;text-decoration:none;">Pesanan Selesai.</a>
+                        </div>';
+                    }
+                    $html .= '<button style="outline:none;border:none;cursor:pointer;background:#4287f5;color:#fff;padding:5px 10px;border-radius:5px;margin-top:10px;font-size:11px;" id="btnPrint" onclick="printStruk()"><i class="fas fa-print"></i>&nbsp; Cetak</button>
+                        </div>
+                    </div>
+                    ';
+                }
+            } 
         } else {
             //disini tampilkan bukan semua pesanan
         }

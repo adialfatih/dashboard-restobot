@@ -17,6 +17,25 @@
                     <i class="fas fa-credit-card"></i>
                     <span class="menu-text">Pembayaran</span>
                 </a>
+                <div class="has-submenu">
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-truck"></i>
+                        <span class="menu-text">Pesan Antar</span>
+                        <i class="fas fa-chevron-right submenu-toggle"></i>
+                    </a>
+                    <div class="submenu">
+                        <a href="#" class="submenu-item">ON / OFF</a>
+                        <a href="#" class="submenu-item">Atur Zona</a>
+                    </div>
+                </div>
+                <a href="javascript:void(0);" onclick="inputPembayaran()" class="menu-item">
+                    <i class="fas fa-list"></i>
+                    <span class="menu-text">Daftar Menu</span>
+                </a>
+                <a href="javascript:void(0);" onclick="inputPembayaran()" class="menu-item">
+                    <i class="fas fa-clock"></i>
+                    <span class="menu-text">Jam Buka</span>
+                </a>
                 <?php if($sess_akses=="admin"){?>
                 <a href="#" class="menu-item">
                     <i class="fas fa-chart-line"></i>
