@@ -203,7 +203,7 @@
 
         // Klik di luar modal akan menutup
         window.addEventListener('click', function (e) {
-            const modals = ['modalSmall', 'modalMedium', 'modalLarge'];
+            const modals = ['modalSmall', 'modalMedium', 'modalLarge', 'modalLarge2'];
             modals.forEach(id => {
             const modal = document.getElementById(id);
             if (e.target === modal) modal.style.display = 'none';
@@ -539,6 +539,34 @@
             .then(res => res.json())
             .then(res => console.log(res))
             .catch(err => console.error(err));
+        }
+        function showDetail(id){
+            let loadingTimer;
+            const LOADING_DELAY_MS = 300;
+            loadingTimer = setTimeout(() => {
+                Swal.fire({ allowOutsideClick: false,  allowEscapeKey: false,
+                    didOpen: () => { Swal.showLoading(); }, 
+                });
+            }, LOADING_DELAY_MS);
+            $.ajax({
+                url: '<?=base_url('data/detilPesanan');?>',
+                type: 'GET',
+                dataType: 'html',
+                data: {  'id': id },
+                success: function(response) {
+                    clearTimeout(loadingTimer); 
+                    Swal.close();
+                    $('#modalPesananBody').html(response);
+                    const modal = document.getElementById('modalLarge2');
+                    if (modal) modal.style.display = 'flex';
+                },
+                error: function(xhr, status, error) { 
+                    clearTimeout(loadingTimer); 
+                    Swal.close(); 
+                    console.error("AJAX Error:", status, error);
+                    console.log(xhr.responseText);
+                }
+            });
         }
 <?php } ?>
 

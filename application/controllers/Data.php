@@ -198,14 +198,19 @@ class Data extends CI_Controller
 
     function show_pesanan(){
         $tipe = $this->input->post('tipe', TRUE);
+        $fromTgl = $this->input->post('fromtgl', TRUE);
+        if($fromTgl=="null" || $fromTgl==""){
+            $tgl_now = date('Y-m-d');
+        } else {
+            $tgl_now = $fromTgl;
+        }
         $html = "";
         if($tipe=="all"){
-            $tgl_now = date('Y-m-d');
-            //$html .= ''.$tgl_now.'<br>';
             //tampilkan yang statusnya adalah sedang dibuat
-            $qry1 = $this->db->query("SELECT pesanan.id, pesanan.kode_pesanan, pesanan.nomor_wa, pesanan.daftar_kode_menu, pesanan.total_harga, pesanan.metode_pengambilan, pesanan.alamat, pesanan.no_meja, pesanan.metode_pembayaran, pesanan.status, pesanan.tanggal, pesanan.created_at, user.nama FROM pesanan,user WHERE pesanan.nomor_wa=user.nomor_wa AND pesanan.status='Sedang dibuat' ORDER BY id");
+            $qry1 = $this->db->query("SELECT pesanan.id, pesanan.kode_pesanan, pesanan.nomor_wa, pesanan.daftar_kode_menu, pesanan.total_harga, pesanan.metode_pengambilan, pesanan.alamat, pesanan.no_meja, pesanan.metode_pembayaran, pesanan.status, pesanan.tanggal, pesanan.created_at, user.nama FROM pesanan,user WHERE pesanan.nomor_wa=user.nomor_wa AND pesanan.status='Sedang dibuat' AND DATE(pesanan.tanggal)='$tgl_now' ORDER BY id");
             if($qry1->num_rows() > 0){
                 foreach($qry1->result() as $row){
+                    $idid = $row->id;
                     $nama_pemesan = strtolower($row->nama);
                     if($row->status == "Dibatalkan"){
                         $efek = "style='color:red;'";
@@ -232,7 +237,7 @@ class Data extends CI_Controller
                     $x = explode(",", $row->daftar_kode_menu);
                     $html .= '
                     <div class="card">
-                        <div class="card-header">
+                        <div class="card-header" style="cursor:pointer;" onclick="showDetail('.$idid.')">
                             <div>
                                 <div class="card-title">'.ucwords($nama_pemesan).'</div>
                                 <div class="card-value">'.$row->kode_pesanan.'</div>
@@ -253,26 +258,28 @@ class Data extends CI_Controller
                             </div>
                         ';
                     }
-                    if($row->status == "Dibayar"){
-                        $html .= '<div style="font-size:12px;border-top:1px solid #ccc;margin-top:10px;padding-top:5px;">
-                            <a href="javascript:void(0);" onclick="tandaiSedangDibuat(\'' . $row->kode_pesanan . '\');" style="color:red;text-decoration:none;">Tandai sedang dibuat.</a>
-                        </div>';
-                    }
                     if($row->status == "Sedang dibuat"){
                         $html .= '<div style="font-size:12px;border-top:1px solid #ccc;margin-top:10px;padding-top:5px;">
-                            <a href="javascript:void(0);" onclick="tandaiSelesaiDibuat(\'' . $row->kode_pesanan . '\');" style="color:green;text-decoration:none;">Pesanan Selesai.</a>
+                            <a href="javascript:void(0);" onclick="tandaiSelesaiDibuat(\'' . $row->kode_pesanan . '\');" style="color:green;text-decoration:none;">Tandai Pesanan Selesai.</a>
                         </div>';
                     }
-                    $html .= '<button style="outline:none;border:none;cursor:pointer;background:#4287f5;color:#fff;padding:5px 10px;border-radius:5px;margin-top:10px;font-size:11px;" id="btnPrint" onclick="printStruk()"><i class="fas fa-print"></i>&nbsp; Cetak</button>
+                    $html .= '<div style="width:100%;display:flex;justify-content:space-between;align-items:center;"><button style="outline:none;border:none;cursor:pointer;background:#4287f5;color:#fff;padding:5px 10px;border-radius:5px;margin-top:10px;font-size:11px;" onclick="printStruk()"><i class="fas fa-print"></i>&nbsp; Cetak</button>';
+                    if($row->metode_pembayaran == "Cash"){
+                        $html .= '<button style="outline:none;border:none;background:#078a07;color:#fff;padding:5px 10px;border-radius:5px;margin-top:10px;font-size:11px;"><i class="fas fa-money-bill"></i>&nbsp; Cash</button>';
+                    } else {
+                        $html .= '<button style="outline:none;border:none;background:#c90808;color:#fff;padding:5px 10px;border-radius:5px;margin-top:10px;font-size:11px;"><i class="fas fa-qrcode"></i>&nbsp; QRIS</button>';
+                    }
+                    $html .= '</div>
                         </div>
                     </div>
                     ';
                 }
             }
             //tampilkan yang statusnya adalah dibayar
-            $qry2 = $this->db->query("SELECT pesanan.id, pesanan.kode_pesanan, pesanan.nomor_wa, pesanan.daftar_kode_menu, pesanan.total_harga, pesanan.metode_pengambilan, pesanan.alamat, pesanan.no_meja, pesanan.metode_pembayaran, pesanan.status, pesanan.tanggal, pesanan.created_at, user.nama FROM pesanan,user WHERE pesanan.nomor_wa=user.nomor_wa AND pesanan.status='Dibayar' ORDER BY id");
+            $qry2 = $this->db->query("SELECT pesanan.id, pesanan.kode_pesanan, pesanan.nomor_wa, pesanan.daftar_kode_menu, pesanan.total_harga, pesanan.metode_pengambilan, pesanan.alamat, pesanan.no_meja, pesanan.metode_pembayaran, pesanan.status, pesanan.tanggal, pesanan.created_at, user.nama FROM pesanan,user WHERE pesanan.nomor_wa=user.nomor_wa AND pesanan.status='Dibayar' AND DATE(pesanan.tanggal)='$tgl_now' ORDER BY id");
             if($qry2->num_rows() > 0){
                 foreach($qry2->result() as $row){
+                    $idid = $row->id;
                     $nama_pemesan = strtolower($row->nama);
                     if($row->status == "Dibatalkan"){
                         $efek = "style='color:red;'";
@@ -299,7 +306,7 @@ class Data extends CI_Controller
                     $x = explode(",", $row->daftar_kode_menu);
                     $html .= '
                     <div class="card">
-                        <div class="card-header">
+                        <div class="card-header" style="cursor:pointer;" onclick="showDetail('.$idid.')">
                             <div>
                                 <div class="card-title">'.ucwords($nama_pemesan).'</div>
                                 <div class="card-value">'.$row->kode_pesanan.'</div>
@@ -325,21 +332,23 @@ class Data extends CI_Controller
                             <a href="javascript:void(0);" onclick="tandaiSedangDibuat(\'' . $row->kode_pesanan . '\');" style="color:red;text-decoration:none;">Tandai sedang dibuat.</a>
                         </div>';
                     }
-                    if($row->status == "Sedang dibuat"){
-                        $html .= '<div style="font-size:12px;border-top:1px solid #ccc;margin-top:10px;padding-top:5px;">
-                            <a href="javascript:void(0);" onclick="tandaiSelesaiDibuat(\'' . $row->kode_pesanan . '\');" style="color:green;text-decoration:none;">Pesanan Selesai.</a>
-                        </div>';
+                    $html .= '<div style="width:100%;display:flex;justify-content:space-between;align-items:center;"><button style="outline:none;border:none;cursor:pointer;background:#4287f5;color:#fff;padding:5px 10px;border-radius:5px;margin-top:10px;font-size:11px;" onclick="printStruk()"><i class="fas fa-print"></i>&nbsp; Cetak</button>';
+                    if($row->metode_pembayaran == "Cash"){
+                        $html .= '<button style="outline:none;border:none;background:#078a07;color:#fff;padding:5px 10px;border-radius:5px;margin-top:10px;font-size:11px;"><i class="fas fa-money-bill"></i>&nbsp; Cash</button>';
+                    } else {
+                        $html .= '<button style="outline:none;border:none;background:#c90808;color:#fff;padding:5px 10px;border-radius:5px;margin-top:10px;font-size:11px;"><i class="fas fa-qrcode"></i>&nbsp; QRIS</button>';
                     }
-                    $html .= '<button style="outline:none;border:none;cursor:pointer;background:#4287f5;color:#fff;padding:5px 10px;border-radius:5px;margin-top:10px;font-size:11px;" id="btnPrint" onclick="printStruk()"><i class="fas fa-print"></i>&nbsp; Cetak</button>
+                    $html .= '</div>
                         </div>
                     </div>
                     ';
                 }
             }
             //tampilkan yang statusnya adalah Menunggu Pembayaran
-            $qry3 = $this->db->query("SELECT pesanan.id, pesanan.kode_pesanan, pesanan.nomor_wa, pesanan.daftar_kode_menu, pesanan.total_harga, pesanan.metode_pengambilan, pesanan.alamat, pesanan.no_meja, pesanan.metode_pembayaran, pesanan.status, pesanan.tanggal, pesanan.created_at, user.nama FROM pesanan,user WHERE pesanan.nomor_wa=user.nomor_wa AND pesanan.status='Menunggu Pembayaran' ORDER BY id");
+            $qry3 = $this->db->query("SELECT pesanan.id, pesanan.kode_pesanan, pesanan.nomor_wa, pesanan.daftar_kode_menu, pesanan.total_harga, pesanan.metode_pengambilan, pesanan.alamat, pesanan.no_meja, pesanan.metode_pembayaran, pesanan.status, pesanan.tanggal, pesanan.created_at, user.nama FROM pesanan,user WHERE pesanan.nomor_wa=user.nomor_wa AND pesanan.status='Menunggu Pembayaran' AND DATE(pesanan.tanggal)='$tgl_now' ORDER BY id");
             if($qry3->num_rows() > 0){
                 foreach($qry3->result() as $row){
+                    $idid = $row->id;
                     $nama_pemesan = strtolower($row->nama);
                     if($row->status == "Dibatalkan"){
                         $efek = "style='color:red;'";
@@ -366,7 +375,7 @@ class Data extends CI_Controller
                     $x = explode(",", $row->daftar_kode_menu);
                     $html .= '
                     <div class="card">
-                        <div class="card-header">
+                        <div class="card-header" style="cursor:pointer;" onclick="showDetail('.$idid.')">
                             <div>
                                 <div class="card-title">'.ucwords($nama_pemesan).'</div>
                                 <div class="card-value">'.$row->kode_pesanan.'</div>
@@ -387,22 +396,22 @@ class Data extends CI_Controller
                             </div>
                         ';
                     }
-                    if($row->status == "Dibayar"){
-                        $html .= '<div style="font-size:12px;border-top:1px solid #ccc;margin-top:10px;padding-top:5px;">
-                            <a href="javascript:void(0);" onclick="tandaiSedangDibuat(\'' . $row->kode_pesanan . '\');" style="color:red;text-decoration:none;">Tandai sedang dibuat.</a>
-                        </div>';
+                    
+                    $html .= '<div style="width:100%;display:flex;justify-content:space-between;align-items:center;"><button style="outline:none;border:none;cursor:pointer;background:#4287f5;color:#fff;padding:5px 10px;border-radius:5px;margin-top:10px;font-size:11px;" onclick="printStruk()"><i class="fas fa-print"></i>&nbsp; Cetak</button>';
+                    if($row->metode_pembayaran == "Cash"){
+                        $html .= '<button style="outline:none;border:none;background:#078a07;color:#fff;padding:5px 10px;border-radius:5px;margin-top:10px;font-size:11px;"><i class="fas fa-money-bill"></i>&nbsp; Cash</button>';
+                    } else {
+                        $html .= '<button style="outline:none;border:none;background:#c90808;color:#fff;padding:5px 10px;border-radius:5px;margin-top:10px;font-size:11px;"><i class="fas fa-qrcode"></i>&nbsp; QRIS</button>';
                     }
-                    if($row->status == "Sedang dibuat"){
-                        $html .= '<div style="font-size:12px;border-top:1px solid #ccc;margin-top:10px;padding-top:5px;">
-                            <a href="javascript:void(0);" onclick="tandaiSelesaiDibuat(\'' . $row->kode_pesanan . '\');" style="color:green;text-decoration:none;">Pesanan Selesai.</a>
-                        </div>';
-                    }
-                    $html .= '<button style="outline:none;border:none;cursor:pointer;background:#4287f5;color:#fff;padding:5px 10px;border-radius:5px;margin-top:10px;font-size:11px;" id="btnPrint" onclick="printStruk()"><i class="fas fa-print"></i>&nbsp; Cetak</button>
+                    $html .= '</div>
                         </div>
                     </div>
                     ';
                 }
             } 
+            if($qry1->num_rows() == 0 && $qry2->num_rows() == 0 && $qry3->num_rows() == 0){
+                $html .= "Hari ini tidak ada pesanan.";
+            }
         } else {
             //disini tampilkan bukan semua pesanan
         }
@@ -516,6 +525,128 @@ class Data extends CI_Controller
         $isi_pesan = "🍻 Pesanan anda selesai dibuat.";
         $this->data_model->kirim_notif_ke_wa($nomor_wa,$isi_pesan,'');
         echo json_encode($response);
+    }
+    function detilPesanan(){
+        $kode = $this->input->get('id', TRUE);
+        $qry1 = $this->db->query("SELECT pesanan.id, pesanan.kode_pesanan, pesanan.nomor_wa, pesanan.daftar_kode_menu, pesanan.total_harga, pesanan.metode_pengambilan, pesanan.alamat, pesanan.no_meja, pesanan.metode_pembayaran, pesanan.status, pesanan.tanggal, pesanan.created_at, pesanan.biaya_delivery, user.nama FROM pesanan,user WHERE pesanan.nomor_wa=user.nomor_wa AND pesanan.id='$kode'");
+        if($qry1->num_rows() == 1){
+            $tipecus = $qry1->row("metode_pengambilan");
+            ?>
+            <div style="width:100%;display:flex;justify-content:flex-start;align-items:center;">
+                <span style="width:200px;">Kode Pesanan</span>
+                <span>: &nbsp;<strong><?php echo $qry1->row("kode_pesanan"); ?></strong></span>
+            </div>
+            <div style="width:100%;display:flex;justify-content:flex-start;align-items:center;">
+                <span style="width:200px;">Nama Customer</span>
+                <span>: &nbsp;<strong><?php echo $qry1->row("nama"); ?></strong></span>
+            </div>
+            <?php if($tipecus == "Dine In"){ ?>
+            <div style="width:100%;display:flex;justify-content:flex-start;align-items:center;">
+                <span style="width:200px;">Tipe</span>
+                <span>: &nbsp;<strong>Dine in</strong> (<strong><?php echo $qry1->row("no_meja"); ?></strong>)</span>
+            </div>
+            <?php } ?>
+            <?php if($tipecus == "Take Away"){ ?>
+            <div style="width:100%;display:flex;justify-content:flex-start;align-items:center;">
+                <span style="width:200px;">Tipe</span>
+                <span>: &nbsp;<strong>Take Away</strong></span>
+            </div>
+            <?php } ?>
+            <?php if($tipecus == "Delivery"){ ?>
+            <div style="width:100%;display:flex;justify-content:flex-start;align-items:center;">
+                <span style="width:200px;">Tipe</span>
+                <span>: &nbsp;<strong>Delivery</strong></span>
+            </div>
+            <div style="width:100%;display:flex;justify-content:flex-start;align-items:center;">
+                <span style="width:200px;">Alamat Delivery</span>
+                <span>: &nbsp;<strong><?php echo $qry1->row("alamat"); ?></strong></span>
+            </div>
+            <?php } ?>
+            <div style="width:100%;display:flex;justify-content:flex-start;align-items:center;">
+                <span style="width:200px;">Metode Pembayaran</span>
+                <span>: &nbsp;<strong><?php echo $qry1->row("metode_pembayaran"); ?></strong></span>
+            </div>
+            <div style="width:100%;display:flex;justify-content:flex-start;align-items:center;">
+                <span style="width:200px;">Status</span>
+                <?php
+                if($qry1->row("status") == "Dibatalkan"){
+                    $efek = "style='color:red;'";
+                } elseif($qry1->row("status") == "Selesai"){ 
+                    $efek = "style='color:green;'";
+                } elseif($qry1->row("status")=="Menunggu Pembayaran"){
+                    $efek = "style='color:orange;'";
+                } elseif($qry1->row("status")=="Dibayar"){
+                    $efek = "style='color:blue;'";
+                } elseif($qry1->row("status")=="Sedang dibuat"){
+                    $efek = "style='color:#fc03be;'";
+                }
+                ?>
+                <span>: &nbsp;<strong <?=$efek;?>><?php echo $qry1->row("status"); ?></strong></span>
+            </div>
+            <div style="width:100%;display:flex;justify-content:flex-start;align-items:center;">
+                <span style="width:200px;">Waktu Pemesanan</span>
+                <span>: &nbsp;<?php echo date('d M Y, H:i', strtotime($qry1->row("tanggal"))); ?></span>
+            </div>
+            <table border="1" style="margin:15px 0 20px 0;">
+                <thead>
+                    <tr>
+                        <td>No</td>
+                        <td>Menu</td>
+                        <td>Harga</td>
+                        <td>Qty</td>
+                        <td>Total</td>
+                    </tr>
+                </thead>
+                <tbody>
+                <?php
+                $x = explode(',',$qry1->row("daftar_kode_menu"));
+                $all_total = 0;
+                for ($i=0; $i <count($x) ; $i++) { 
+                    $xx = explode('x', $x[$i]);
+                    $idmenu = $xx[0];
+                    $qty = $xx[1];
+                    $z = $this->db->query("SELECT * FROM table_menu WHERE kode_menu='$idmenu'")->row();
+                    $ttl1 = $z->harga * $qty;
+                    $ttl1f = number_format($ttl1);
+                    $all_total += $ttl1;
+                    ?>
+                    <tr>
+                        <td><?php echo $i+1; ?></td>
+                        <td><?php echo $z->nama_menu; ?></td>
+                        <td>Rp. <?php echo number_format($z->harga); ?></td>
+                        <td><?php echo $qty; ?></td>
+                        <td>Rp. <?php echo $ttl1f; ?></td>
+                    </tr>
+                    <?php
+                }
+                ?>
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td colspan="3"><?=$tipecus=="Delivery" ? "Total Menu":"<strong>Total</strong>";?></td>
+                    <td></td>
+                    <td>Rp. <?php echo number_format($all_total); ?></td>
+                </tr>
+                <?php if($tipecus == "Delivery"){ 
+                $ttlDeliv = $all_total + $qry1->row("biaya_delivery");
+                ?>
+                <tr>
+                    <td colspan="3">Biaya Kirim</td>
+                    <td></td>
+                    <td>Rp. <?php echo number_format($qry1->row("biaya_delivery")); ?></td>
+                </tr>
+                <tr>
+                    <td colspan="3"><strong>Total Tagihan</strong></td>
+                    <td></td>
+                    <td>Rp. <strong><?php echo number_format($ttlDeliv); ?></strong></td>
+                </tr>
+                <?php } ?>
+                </tfoot>
+            </table>
+            <?php
+        } else {
+            echo "Error Token : 914";
+        }
     }
 }
 ?>

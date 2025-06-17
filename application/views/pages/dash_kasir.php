@@ -58,3 +58,13 @@
             </div>
         </div>
     </div>
+    <!-- Large Modal 2-->
+    <div id="modalLarge2" class="modal">
+        <div class="modal-dialog modal-large">
+            <button class="modal-close" onclick="closeModal('modalLarge2')">&times;</button>
+            <h4>Detail Pesanan</h4>
+            <div class="form-container" id="modalPesananBody">
+                Loading...
+            </div>
+        </div>
+    </div>
