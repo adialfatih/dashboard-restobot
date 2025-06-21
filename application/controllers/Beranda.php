@@ -11,7 +11,7 @@ class Beranda extends CI_Controller
         redirect(base_url('login'));
       }
   }
-   
+  
   function index(){ 
         $akses = $this->session->userdata('akses');
         $data = array(

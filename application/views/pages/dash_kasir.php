@@ -6,11 +6,11 @@
                     <ul class="breadcrumb">
                         <li><a href="#">Home</a></li>
                         <li>Dashboard</li>
-                        <li>Pesanan</li>
+                        <li>Pesanan Hari Ini</li>
                     </ul>
                 </div>
                 <div class="page-actions">
-                    <button onclick="openModal('modalLarge')"><i class="fas fa-plus"></i> Buat Pesanan</button>
+                    <button onclick="openModal('newOrder')"><i class="fas fa-plus"></i> Buat Pesanan</button>
                 </div>
             </div>
             <div class="card-grid" id="cardGridView">
@@ -65,6 +65,16 @@
             <h4>Detail Pesanan</h4>
             <div class="form-container" id="modalPesananBody">
                 Loading...
+            </div>
+        </div>
+    </div>
+    <!-- Large Modal 3-->
+    <div id="newOrder" class="modal">
+        <div class="modal-dialog modal-large">
+            <button class="modal-close" onclick="closeModal('newOrder')">&times;</button>
+            <h4>Buat Pesanan</h4>
+            <div class="form-container" id="modalPesananBody">
+                Fitur belum tersedia
             </div>
         </div>
     </div>

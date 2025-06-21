@@ -19,15 +19,34 @@
                 </a>
                 <div class="has-submenu">
                     <a href="#" class="menu-item">
+                        <i class="fas fa-shopping-basket"></i>
+                        <span class="menu-text">Pesanan</span>
+                        <i class="fas fa-chevron-right submenu-toggle"></i>
+                    </a>
+                    <div class="submenu">
+                        <a href="#" class="submenu-item">Hari ini</a>
+                        <a href="#" class="submenu-item">Selesai</a>
+                    </div>
+                </div>
+                <div class="has-submenu">
+                    <a href="#" class="menu-item">
                         <i class="fas fa-truck"></i>
                         <span class="menu-text">Pesan Antar</span>
                         <i class="fas fa-chevron-right submenu-toggle"></i>
                     </a>
                     <div class="submenu">
-                        <a href="#" class="submenu-item">ON / OFF</a>
+                <?php
+                $dev = $this->data_model->get_byid('opsi_pengiriman',['id'=>1])->row("delivery_active");
+                if($dev == TRUE){
+                    ?><a href="javascript:void(0);" id="menuonoff" class="submenu-item"><span style="color:green;">ON</span>&nbsp;/&nbsp;<span >OFF</span></a><?php
+                } else {
+                    ?><a href="javascript:void(0);" id="menuonoff" class="submenu-item"><span>ON</span>&nbsp;/&nbsp;<span style="color:red;">OFF</span></a><?php
+                }
+                ?>
                         <a href="#" class="submenu-item">Atur Zona</a>
                     </div>
                 </div>
+                
                 <a href="javascript:void(0);" onclick="inputPembayaran()" class="menu-item">
                     <i class="fas fa-list"></i>
                     <span class="menu-text">Daftar Menu</span>
@@ -97,8 +116,9 @@
                 </button>
                 <div class="search-bar">
                     <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Search...">
+                    <input type="text" placeholder="Konfirmasi kode unik" id="konfKodeUnik">
                 </div>
+                
             </div>
             <div class="header-right">
                 <div class="notification">

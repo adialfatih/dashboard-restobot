@@ -210,10 +210,10 @@
             });
         });
 <?php if($showData=="orderUser"){?>
-        loadPesanan('all');
-        function loadPesanan(tipe){
+        loadPesanan('all','1');
+        function loadPesanan(tipe,loading){
             $('#loader').show();
-            $('#cardGridView').html('');
+            if(loading=='1'){ $('#cardGridView').html(''); }
             var csrfName = $('#csrf_token_name').val();
             var csrfHash = $('#csrf_token_value').val();
             $.ajax({
@@ -225,15 +225,23 @@
     				[csrfName]: csrfHash
 				},
 				success: function(response) {
+                    if(loading=='1'){
                     setTimeout(() => {
                         $('#cardGridView').html(response.html);
                         $('#csrf_token_value').val(response.newCsrfHash);
                         $('#loader').hide();
-                    }, 100);
-                    
+                    }, 300);
+                    } else {
+                        $('#cardGridView').html(response.html);
+                        $('#csrf_token_value').val(response.newCsrfHash);
+                        $('#loader').hide();
+                    }
 				}
             });
         }
+        setInterval(() => {
+            loadPesanan('all','0');
+        }, 10000);
         function inputPembayaran(){
             const modal = document.getElementById('modalLarge');
             if (modal) modal.style.display = 'flex';
@@ -568,8 +576,67 @@
                 }
             });
         }
+        function konsfirmasiPay(id){
+            Swal.fire({
+                title: "Konfirmasi pembayaran ?",
+                text: "Status pesanan akan berubah",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Konfirmasi"
+                }).then((result) => {
+                if (result.isConfirmed) {
+                    const modal = document.getElementById('modalLarge2');
+                    if (modal) modal.style.display = 'none';
+                    $.ajax({
+                        url: '<?=base_url('data/updateStatusBayar');?>',
+                        type: 'GET',
+                        dataType: 'json',
+                        data: { 'id': id },
+                        success: function(response) {
+                            showDetail(id);
+                            loadPesanan('all');
+                        }
+                    });
+                }
+            });
+        }
+        
 <?php } ?>
-
+        document.getElementById("konfKodeUnik").addEventListener("input", function () {
+        const input = this.value;
+        const isThreeDigitNumber = /^[0-9]{3}$/.test(input);
+            if (isThreeDigitNumber) {
+                Swal.showLoading();
+                var csrfName  = $('#csrf_token_name').val();
+                var csrfHash  = $('#csrf_token_value').val();
+                $.ajax({
+                    url: '<?=base_url('data/updatePembayaranQris');?>',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: { 'kodeUnik': input, [csrfName]: csrfHash },
+                    success: function(response) {
+                        $('#csrf_token_value').val(response.newCsrfHash);
+                    }
+                });
+            }
+        });
+        document.getElementById("menuonoff").addEventListener("click", function () {
+            $.ajax({
+                url: '<?=base_url('data/cekDeliv');?>',
+                type: 'GET',
+                dataType: 'json',
+                data: { },
+                success: function(response) {
+                    if(response.status == "now_off"){
+                        $('#menuonoff').html('<span>ON</span>&nbsp;/&nbsp;<span style="color:red;">OFF</span>');
+                    } else {
+                        $('#menuonoff').html('<span style="color:green;">ON</span>&nbsp;/&nbsp;<span >OFF</span>');
+                    }
+                }
+            });
+        });
     </script>
 </body>
 </html>

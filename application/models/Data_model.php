@@ -203,7 +203,13 @@ class Data_model extends CI_Model{
           'isi_pesanan' => $isi,
           'urlmedia' => $media
       ];
-
+      $data1 = [
+          'nomor_wa' => $nomor,
+          'isi_pesanan' => $isi,
+          'urlmedia' => $media,
+          'tim' => date('Y-m-d H:i:s')
+      ];
+      $this->db->insert('pesan_terkirim',$data1);
       $ch = curl_init('http://103.27.206.33:3001/api/kirim-pesan');
       curl_setopt($ch, CURLOPT_POST, 1);
       curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));

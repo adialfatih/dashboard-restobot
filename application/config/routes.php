@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-$route['default_controller'] = 'login';
+$route['default_controller'] = 'login/halaman_utama';
 $route['dashboard'] = 'beranda';
 //$route['manager-dashboard'] = 'beranda/dsbmng';
 $route['operator-dashboard'] = 'beranda/dsbopt';

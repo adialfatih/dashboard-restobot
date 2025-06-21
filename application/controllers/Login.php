@@ -14,6 +14,9 @@ class Login extends CI_Controller
         $this->session->sess_destroy();
         $this->load->view('login_form');
   } //end
+  function halaman_utama(){
+      $this->load->view('dashboard_utama', $data); 
+  }
 
   function actlogin(){
         $username = $this->input->post('username', TRUE);

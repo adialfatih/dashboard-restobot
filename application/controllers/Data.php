@@ -263,13 +263,19 @@ class Data extends CI_Controller
                             <a href="javascript:void(0);" onclick="tandaiSelesaiDibuat(\'' . $row->kode_pesanan . '\');" style="color:green;text-decoration:none;">Tandai Pesanan Selesai.</a>
                         </div>';
                     }
-                    $html .= '<div style="width:100%;display:flex;justify-content:space-between;align-items:center;"><button style="outline:none;border:none;cursor:pointer;background:#4287f5;color:#fff;padding:5px 10px;border-radius:5px;margin-top:10px;font-size:11px;" onclick="printStruk()"><i class="fas fa-print"></i>&nbsp; Cetak</button>';
+                    $html .= '<div style="width:100%;display:flex;justify-content:space-between;align-items:center;"><button style="outline:none;border:none;cursor:pointer;background:#CCCCCC;color:#000;padding:5px 10px;border-radius:5px;margin-top:10px;font-size:11px;" onclick="printStruk()"><i class="fas fa-print"></i>&nbsp; Cetak</button><div style="display:flex;align-items:center;gap:5px;">';
                     if($row->metode_pembayaran == "Cash"){
                         $html .= '<button style="outline:none;border:none;background:#078a07;color:#fff;padding:5px 10px;border-radius:5px;margin-top:10px;font-size:11px;"><i class="fas fa-money-bill"></i>&nbsp; Cash</button>';
                     } else {
                         $html .= '<button style="outline:none;border:none;background:#c90808;color:#fff;padding:5px 10px;border-radius:5px;margin-top:10px;font-size:11px;"><i class="fas fa-qrcode"></i>&nbsp; QRIS</button>';
                     }
-                    $html .= '</div>
+                    if($row->metode_pengambilan == "Dine In"){
+                        $html .='<button style="outline:none;border:none;background:#ccc;color:#000;padding:5px 10px;border-radius:5px;margin-top:10px;font-size:11px;">Dine in (<strong>'.$row->no_meja.'</strong>)</button>';
+                    } else {
+                        $html .='<button style="outline:none;border:none;background:#ccc;color:#000;padding:5px 10px;border-radius:5px;margin-top:10px;font-size:11px;">'.$row->metode_pengambilan.'</button>';
+                    }
+                    
+                    $html .= '</div></div>
                         </div>
                     </div>
                     ';
@@ -332,13 +338,19 @@ class Data extends CI_Controller
                             <a href="javascript:void(0);" onclick="tandaiSedangDibuat(\'' . $row->kode_pesanan . '\');" style="color:red;text-decoration:none;">Tandai sedang dibuat.</a>
                         </div>';
                     }
-                    $html .= '<div style="width:100%;display:flex;justify-content:space-between;align-items:center;"><button style="outline:none;border:none;cursor:pointer;background:#4287f5;color:#fff;padding:5px 10px;border-radius:5px;margin-top:10px;font-size:11px;" onclick="printStruk()"><i class="fas fa-print"></i>&nbsp; Cetak</button>';
+                    $html .= '<div style="width:100%;display:flex;justify-content:space-between;align-items:center;"><button style="outline:none;border:none;cursor:pointer;background:#CCCCCC;color:#000;padding:5px 10px;border-radius:5px;margin-top:10px;font-size:11px;" onclick="printStruk()"><i class="fas fa-print"></i>&nbsp; Cetak</button><div style="display:flex;align-items:center;gap:5px;">';
                     if($row->metode_pembayaran == "Cash"){
                         $html .= '<button style="outline:none;border:none;background:#078a07;color:#fff;padding:5px 10px;border-radius:5px;margin-top:10px;font-size:11px;"><i class="fas fa-money-bill"></i>&nbsp; Cash</button>';
                     } else {
                         $html .= '<button style="outline:none;border:none;background:#c90808;color:#fff;padding:5px 10px;border-radius:5px;margin-top:10px;font-size:11px;"><i class="fas fa-qrcode"></i>&nbsp; QRIS</button>';
                     }
-                    $html .= '</div>
+                    if($row->metode_pengambilan == "Dine In"){
+                        $html .='<button style="outline:none;border:none;background:#ccc;color:#000;padding:5px 10px;border-radius:5px;margin-top:10px;font-size:11px;">Dine in (<strong>'.$row->no_meja.'</strong>)</button>';
+                    } else {
+                        $html .='<button style="outline:none;border:none;background:#ccc;color:#000;padding:5px 10px;border-radius:5px;margin-top:10px;font-size:11px;">'.$row->metode_pengambilan.'</button>';
+                    }
+                    
+                    $html .= '</div></div>
                         </div>
                     </div>
                     ';
@@ -397,13 +409,19 @@ class Data extends CI_Controller
                         ';
                     }
                     
-                    $html .= '<div style="width:100%;display:flex;justify-content:space-between;align-items:center;"><button style="outline:none;border:none;cursor:pointer;background:#4287f5;color:#fff;padding:5px 10px;border-radius:5px;margin-top:10px;font-size:11px;" onclick="printStruk()"><i class="fas fa-print"></i>&nbsp; Cetak</button>';
+                    $html .= '<div style="width:100%;display:flex;justify-content:space-between;align-items:center;"><button style="outline:none;border:none;cursor:pointer;background:#CCCCCC;color:#000;padding:5px 10px;border-radius:5px;margin-top:10px;font-size:11px;" onclick="printStruk()"><i class="fas fa-print"></i>&nbsp; Cetak</button><div style="display:flex;align-items:center;gap:5px;">';
                     if($row->metode_pembayaran == "Cash"){
                         $html .= '<button style="outline:none;border:none;background:#078a07;color:#fff;padding:5px 10px;border-radius:5px;margin-top:10px;font-size:11px;"><i class="fas fa-money-bill"></i>&nbsp; Cash</button>';
                     } else {
                         $html .= '<button style="outline:none;border:none;background:#c90808;color:#fff;padding:5px 10px;border-radius:5px;margin-top:10px;font-size:11px;"><i class="fas fa-qrcode"></i>&nbsp; QRIS</button>';
                     }
-                    $html .= '</div>
+                    if($row->metode_pengambilan == "Dine In"){
+                        $html .='<button style="outline:none;border:none;background:#ccc;color:#000;padding:5px 10px;border-radius:5px;margin-top:10px;font-size:11px;">Dine in (<strong>'.$row->no_meja.'</strong>)</button>';
+                    } else {
+                        $html .='<button style="outline:none;border:none;background:#ccc;color:#000;padding:5px 10px;border-radius:5px;margin-top:10px;font-size:11px;">'.$row->metode_pengambilan.'</button>';
+                    }
+                    
+                    $html .= '</div></div>
                         </div>
                     </div>
                     ';
@@ -531,6 +549,7 @@ class Data extends CI_Controller
         $qry1 = $this->db->query("SELECT pesanan.id, pesanan.kode_pesanan, pesanan.nomor_wa, pesanan.daftar_kode_menu, pesanan.total_harga, pesanan.metode_pengambilan, pesanan.alamat, pesanan.no_meja, pesanan.metode_pembayaran, pesanan.status, pesanan.tanggal, pesanan.created_at, pesanan.biaya_delivery, user.nama FROM pesanan,user WHERE pesanan.nomor_wa=user.nomor_wa AND pesanan.id='$kode'");
         if($qry1->num_rows() == 1){
             $tipecus = $qry1->row("metode_pengambilan");
+            $idpesanan = $qry1->row("id");
             ?>
             <div style="width:100%;display:flex;justify-content:flex-start;align-items:center;">
                 <span style="width:200px;">Kode Pesanan</span>
@@ -587,6 +606,11 @@ class Data extends CI_Controller
                 <span style="width:200px;">Waktu Pemesanan</span>
                 <span>: &nbsp;<?php echo date('d M Y, H:i', strtotime($qry1->row("tanggal"))); ?></span>
             </div>
+            <?php if($qry1->row("status") == "Menunggu Pembayaran"){ ?>
+            <div style="width:100%;display:flex;justify-content:flex-end;align-items:center;">
+                <button class="btn btn-blue" onclick="konsfirmasiPay('<?=$idpesanan;?>')">Konfirmasi Pembayaran</button>
+            </div>
+            <?php } ?>
             <table border="1" style="margin:15px 0 20px 0;">
                 <thead>
                     <tr>
@@ -647,6 +671,32 @@ class Data extends CI_Controller
         } else {
             echo "Error Token : 914";
         }
+    }
+    function updateStatusBayar(){
+        $id   = $this->input->get('id', TRUE);
+        $this->data_model->updatedata('id',$id,'pesanan', ['status' => 'Dibayar']);
+        $nomor_wa = $this->db->query("SELECT id,nomor_wa FROM pesanan WHERE id='$id'")->row("nomor_wa");
+        $isi_pesan = "✅ Terimakasih, pembayaran telah diterima";
+        $this->data_model->kirim_notif_ke_wa($nomor_wa,$isi_pesan,'');
+        $response = [
+            'status' => 'success'
+        ];
+        echo json_encode($response);
+    }
+    function cekDeliv(){
+        $dev = $this->data_model->get_byid('opsi_pengiriman',['id'=>1])->row("delivery_active");
+        if($dev == 1){
+            $response = [
+                'status' => 'now_off'
+            ];
+            $this->data_model->updatedata('id',1,'opsi_pengiriman', ['delivery_active' => 0]);
+        } else {
+            $response = [
+                'status' => 'now_on'
+            ];
+            $this->data_model->updatedata('id',1,'opsi_pengiriman', ['delivery_active' => 1]);
+        }
+        echo json_encode($response);
     }
 }
 ?>
