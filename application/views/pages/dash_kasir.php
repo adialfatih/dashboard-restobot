@@ -13,7 +13,128 @@
                     <button onclick="openModal('newOrder')"><i class="fas fa-plus"></i> Buat Pesanan</button>
                 </div>
             </div>
-            <div class="card-grid" id="cardGridView">
+
+            <!-- Stats Cards -->
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">Jumlah Pesanan Hari Ini</div>
+                            <div class="card-value">$24,780</div>
+                            <div class="card-change positive">
+                                <i class="fas fa-arrow-up"></i> 12.5% from last month
+                            </div>
+                        </div>
+                        <div class="card-icon blue">
+                            <i class="fas fa-arrow-down-wide-short"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">Jumlah User</div>
+                            <div class="card-value">1,254</div>
+                            <div class="card-change positive">
+                                <i class="fas fa-arrow-up"></i> 8.3% from last month
+                            </div>
+                        </div>
+                        <div class="card-icon green">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">Jumlah Pesanan Selesai</div>
+                            <div class="card-value">56</div>
+                            <div class="card-change negative">
+                                <i class="fas fa-arrow-down"></i> 2.1% from last month
+                            </div>
+                        </div>
+                        <div class="card-icon orange">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">Total Pesanan</div>
+                            <div class="card-value">18</div>
+                            <div class="card-change positive">
+                                <i class="fas fa-arrow-up"></i> 5.7% from last month
+                            </div>
+                        </div>
+                        <div class="card-icon pink">
+                            <i class="fas fa-ticket-alt"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">Jumlah Pesanan Dine In</div>
+                            <div class="card-value">$24,780</div>
+                            <div class="card-change positive">
+                                <i class="fas fa-arrow-up"></i> 12.5% from last month
+                            </div>
+                        </div>
+                        <div class="card-icon blue">
+                            <i class="fa-solid fa-utensils"></i></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">Jumlah Pesanan Take Away</div>
+                            <div class="card-value">1,254</div>
+                            <div class="card-change positive">
+                                <i class="fas fa-arrow-up"></i> 8.3% from last month
+                            </div>
+                        </div>
+                        <div class="card-icon green">
+                            <i class="fa-solid fa-motorcycle"></i></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">Jumlah Pesanan Delivery</div>
+                            <div class="card-value">56</div>
+                            <div class="card-change negative">
+                                <i class="fas fa-arrow-down"></i> 2.1% from last month
+                            </div>
+                        </div>
+                        <div class="card-icon orange">
+                            <i class="fa-solid fa-truck-fast"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">Total Pemasukan</div>
+                            <div class="card-value">18</div>
+                            <div class="card-change positive">
+                                <i class="fas fa-arrow-up"></i> 5.7% from last month
+                            </div>
+                        </div>
+                        <div class="card-icon pink">
+                            <i class="fa-solid fa-sack-dollar"></i></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- <div class="card-grid" id="cardGridView"> -->
             </div>
             <div style="width:100%;height:100px;display:flex;justify-content:center;align-items:center;flex-direction:column;gap:10px;" id="loader">
                 <div class="loader"></div>
@@ -22,6 +143,7 @@
             
             <input type="hidden" id="csrf_token_name" value="<?= $this->security->get_csrf_token_name(); ?>">
 		    <input type="hidden" id="csrf_token_value" value="<?= $this->security->get_csrf_hash(); ?>">
+
         </main>
     </div>
     <!-- Large Modal -->

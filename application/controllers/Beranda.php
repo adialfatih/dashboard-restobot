@@ -29,10 +29,58 @@ class Beranda extends CI_Controller
         if($akses == "admin"){ 
             $this->load->view('beranda_view', $data); 
         } else {
+            // $this->load->view('beranda_view', $data); 
             $this->load->view('pages/dash_kasir', $data); 
         }
         $this->load->view('part/main_js', $data);
-  } //end
+  } 
+  
+  function today(){ 
+    $akses = $this->session->userdata('akses');
+    $data = array(
+        'title'         => 'Welcome To Dashboard',
+        'sess_id'       => $this->session->userdata('id'),
+        'sess_nama'     => $this->session->userdata('nama'),
+        'sess_user'     => $this->session->userdata('username'),
+        'sess_pass'     => $this->session->userdata('password'),
+        'sess_akses'    => $akses,
+        'showData'      => 'orderUser',
+        'navg'          => 'dashboard'
+    );
+    $this->load->view('part/header', $data);
+    $this->load->view('part/left_nav', $data);
+    if($akses == "admin"){ 
+        $this->load->view('beranda_view', $data); 
+    } else {
+        // $this->load->view('beranda_view', $data); 
+        $this->load->view('pages/pesanan_today', $data); 
+    }
+    $this->load->view('part/main_js', $data);
+} 
+
+function selesai(){ 
+  $akses = $this->session->userdata('akses');
+  $data = array(
+      'title'         => 'Welcome To Dashboard',
+      'sess_id'       => $this->session->userdata('id'),
+      'sess_nama'     => $this->session->userdata('nama'),
+      'sess_user'     => $this->session->userdata('username'),
+      'sess_pass'     => $this->session->userdata('password'),
+      'sess_akses'    => $akses,
+      'status'        => 'selesai',
+      'showData'      => 'orderUser',
+      'navg'          => 'dashboard'
+  );
+  $this->load->view('part/header', $data);
+  $this->load->view('part/left_nav', $data);
+  if($akses == "admin"){ 
+      $this->load->view('beranda_view', $data); 
+  } else {
+      // $this->load->view('beranda_view', $data); 
+      $this->load->view('pages/pesanan_selesai', $data); 
+  }
+  $this->load->view('part/main_js', $data);
+} //end
 
   
     

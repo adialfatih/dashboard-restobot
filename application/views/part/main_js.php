@@ -242,6 +242,38 @@
         setInterval(() => {
             loadPesanan('all','0');
         }, 10000);
+        selesailoadPesanan('all','1');
+        function selesailoadPesanan(tipe,loading){
+            $('#loader').show();
+            if(loading=='1'){ $('#cardGridViews').html(''); }
+            var csrfName = $('#csrf_token_name').val();
+            var csrfHash = $('#csrf_token_value').val();
+            $.ajax({
+				url: '<?=base_url('data/show_pesanan_selesai');?>',
+				type: 'POST',
+				dataType: 'json',
+				data: {
+					'tipe': tipe,
+    				[csrfName]: csrfHash
+				},
+				success: function(response) {
+                    if(loading=='1'){
+                    setTimeout(() => {
+                        $('#cardGridViews').html(response.html);
+                        $('#csrf_token_value').val(response.newCsrfHash);
+                        $('#loader').hide();
+                    }, 300);
+                    } else {
+                        $('#cardGridViews').html(response.html);
+                        $('#csrf_token_value').val(response.newCsrfHash);
+                        $('#loader').hide();
+                    }
+				}
+            });
+        }
+        setInterval(() => {
+            selesailoadPesanan('all','0');
+        }, 10000);
         function inputPembayaran(){
             const modal = document.getElementById('modalLarge');
             if (modal) modal.style.display = 'flex';
