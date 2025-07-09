@@ -24,8 +24,8 @@
                         <i class="fas fa-chevron-right submenu-toggle"></i>
                     </a>
                     <div class="submenu">
-                        <a href="#" class="submenu-item">Hari ini</a>
-                        <a href="#" class="submenu-item">Selesai</a>
+                        <a href="<?=base_url('today');?>" class="submenu-item">Hari ini</a>
+                        <a href="<?=base_url('selesai');?>" class="submenu-item">Selesai</a>
                     </div>
                 </div>
                 <div class="has-submenu">
@@ -38,9 +38,9 @@
                 <?php
                 $dev = $this->data_model->get_byid('opsi_pengiriman',['id'=>1])->row("delivery_active");
                 if($dev == TRUE){
-                    ?><a href="javascript:void(0);" id="menuonoff" class="submenu-item"><span style="color:green;">ON</span>&nbsp;/&nbsp;<span >OFF</span></a><?php
+                    ?><a href="javascript:void(0);" id="menuonoff" class="submenu-item"><span style="color:green; text:bold;">ON</span>&nbsp;/&nbsp;<span >OFF</span></a><?php
                 } else {
-                    ?><a href="javascript:void(0);" id="menuonoff" class="submenu-item"><span>ON</span>&nbsp;/&nbsp;<span style="color:red;">OFF</span></a><?php
+                    ?><a href="javascript:void(0);" id="menuonoff" class="submenu-item"><span>ON</span>&nbsp;/&nbsp;<span style="color:red; text:bold;">OFF</span></a><?php
                 }
                 ?>
                         <a href="#" class="submenu-item">Atur Zona</a>

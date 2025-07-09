@@ -3,6 +3,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 $route['default_controller'] = 'login/halaman_utama';
 $route['dashboard'] = 'beranda';
+$route['today'] = 'beranda/today';
+$route['selesai'] = 'beranda/selesai';
 //$route['manager-dashboard'] = 'beranda/dsbmng';
 $route['operator-dashboard'] = 'beranda/dsbopt';
 $route['404_override'] = 'Notfounde';
